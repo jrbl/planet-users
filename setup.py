@@ -23,7 +23,7 @@ for line in open('requirements.txt', 'rb').readlines():
         requires_list += line
 
 setup(
-    name='planet-users',
+    name='usermanager',
     version='0.0.1',
     description=short_desc,
     long_description=long_desc,
@@ -31,7 +31,7 @@ setup(
     license='GPL 3.0',
     author='Joe Blaylock',
     author_email='jrbl@jrbl.org',
-    py_modules=['planet-users'],
+    py_modules=['usermanager'],
     include_package_data=True,
     install_requires=requires_list,
     classifiers=[

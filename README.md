@@ -1,5 +1,5 @@
-planet-users
-============
+usermanager
+===========
 
 A proof-of-concept user management service implementation.
 

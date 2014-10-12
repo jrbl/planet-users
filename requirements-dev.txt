@@ -1,0 +1,14 @@
+# # These things I always want
+ipdb
+ipython
+pyflakes
+pep8
+python-wtf
+
+# # These things I'm less sure about
+#pastescript
+#nose
+#http://douglatornell.ca/software/python/Nosy-1.0.tar.gz
+#coverage
+#sphinx
+#grin

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Post-commit hook for the python-skel repository that installs all of the
+# developer dependencies after every commit.
+pip install -r requirements-dev.txt >requirements_update.out

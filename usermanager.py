@@ -3,12 +3,42 @@
 """A PoC implementation of a user management service"""
 
 
+import json
+
 import flask
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
+# FIXME: get these out of globals
+db_path = '/tmp/usermanager_store.db'
 app = flask.Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///{}".format(db_path)
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Unicode(32), unique=True) # TODO: add index=True (?)
+    firstname = db.Column(db.Unicode(64))
+    lastname = db.Column(db.Unicode(64))
+    groups = db.relationship('Group', backref='user')
+
+    def __init__(self, userid, firstname, lastname, groups=[]):
+        self.userid = userid
+        self.firstname = firstname
+        self.lastname = lastname
+        self.groups = groups # FIXME: FK to groups
+
+    def __repr__(self):
+        # XXX: inefficient, but convenient
+        return u"User({dictvals})".format(dictvals=','.join(["{}={}".format(k,v) for k,v in sorted(self.to_dict()).iteritems()]))
+
+    def to_dict(self):
+        return {'userid': self.userid, 'firstname': self.firstname, 'lastname': self.lastname, 'groups': self.groups}
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
 
 @app.route('/users/<userid>', methods=['GET'])

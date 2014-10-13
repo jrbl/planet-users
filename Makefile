@@ -6,6 +6,9 @@ clean:
 	@rm -rf python-wtf.egg-info
 	@rm -f requirements_update.out
 
+distclean:
+	@git clean -f
+
 test:
 	@for testfile in test_*.py; do \
 		echo Running tests in $$testfile...; \

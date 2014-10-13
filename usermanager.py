@@ -143,7 +143,6 @@ def put_user(userid):
         return flask.Response(USERS[userid].to_json(), mimetype="application/json")
     flask.abort(404, {'method': 'PUT', 'type': 'user'})
 
-# TODO route /groups: GET POST DELETE PUT
 @app.route('/groups/<group_name>', methods=['GET'])
 def get_group(group_name):
     """Return a JSON list of userids containing the members of group_name.

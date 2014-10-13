@@ -8,7 +8,7 @@ def read(*paths):
     with open(os.path.join(*paths), 'r') as f:
         return f.read()
 
-short_desc = "FIXME_FILL_SHORT_DESC"
+short_desc = "A proof-of-concept user management service implementation."
 long_desc = ''
 for rstfile in ('README.rst', 'HISTORY.rst', 'AUTHORS.rst'):
     if os.path.exists(rstfile):

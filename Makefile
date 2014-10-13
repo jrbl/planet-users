@@ -6,5 +6,10 @@ clean:
 	@rm -rf python-wtf.egg-info
 	@rm -f requirements_update.out
 
-publish:
-	@ipython register.py
+test:
+	@for testfile in test_*.py; do \
+		echo Running tests in $$testfile...; \
+		python ./$$testfile; done
+
+#publish:
+#	@ipython register.py

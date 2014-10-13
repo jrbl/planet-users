@@ -31,7 +31,7 @@ class UserAPITestCase(unittest.TestCase):
         self.assertEquals(404, rv.status_code)
 
     def test_get_user_single(self):
-        """A GET against a single user database 404s for users not in database."""
+        """GETs against a single user database 404 for missing users."""
         usermanager.USERS = self.one_user_no_groups.copy()
         test_username, test_userinfo = usermanager.USERS.items()[0]
         rv = self.app.get('/users/%s' % (test_username))
@@ -44,7 +44,7 @@ class UserAPITestCase(unittest.TestCase):
         """A POST of a user against herself is forbidden"""
         usermanager.USERS = self.one_user_no_groups.copy()
         test_username, test_userinfo = usermanager.USERS.items()[0]
-        rv = self.app.post('/users/%s' % (test_username), 
+        rv = self.app.post('/users/%s' % (test_username),
                            data=test_userinfo.to_dict(),
                            content_type='application/json')
         self.assertEquals(403, rv.status_code)
@@ -53,7 +53,7 @@ class UserAPITestCase(unittest.TestCase):
         """A POST against an empty user database is fine."""
         usermanager.USERS = self.no_users.copy()
         test_userinfo = _def_user('user1', [])['user1']
-        rv = self.app.post('/users/user1', 
+        rv = self.app.post('/users/user1',
                            data=test_userinfo.to_json(),
                            content_type='application/json')
         self.assertEquals(200, rv.status_code)
@@ -73,24 +73,25 @@ class UserAPITestCase(unittest.TestCase):
         self.assertEquals(200, rv.status_code)
         self.assertEquals(json.loads(rv.data), {})
         self.assertEquals(usermanager.USERS, {})
-    
+
     def test_put_user_empty_404s(self):
         """A PUT against a user not present in the database raises a 404."""
         usermanager.USERS = self.no_users.copy()
         test_userinfo = _def_user('user1', [])['user1']
-        rv = self.app.put('/users/user1', 
+        rv = self.app.put('/users/user1',
                           data=test_userinfo.to_json(),
                           content_type='application/json')
         self.assertEquals(404, rv.status_code)
 
     def test_put_valid_user_updates(self):
-        """A PUT against a user present in the database changes their values."""
+        """A PUT against existing user changes their values."""
         usermanager.USERS = self.one_user_no_groups.copy()
         test_username, test_userinfo = usermanager.USERS.items()[0]
         test_userinfo_dict = test_userinfo.to_dict()
         target_userinfo_dict = test_userinfo_dict.copy()
-        target_userinfo_dict.update({'firstname':'roberta', 'lastname':'builder'})
-        rv = self.app.put('/users/user1', 
+        target_userinfo_dict.update({'firstname': 'roberta',
+                                     'lastname': 'builder'})
+        rv = self.app.put('/users/user1',
                           data=json.dumps(target_userinfo_dict),
                           content_type='application/json')
         self.assertNotEquals(test_userinfo_dict, target_userinfo_dict)
@@ -118,8 +119,8 @@ class GroupAPITestCase(unittest.TestCase):
         """A GET against a single user database returns that user's groups."""
         usermanager.USERS = {}
         # one user with many groups
-        usermanager._add_user(usermanager.User('user1', '', '', groups=['group1',
-                                                                        'group2']))
+        usermanager._add_user(usermanager.User('user1', '', '',
+                                               groups=['group1', 'group2']))
         test_username, test_userinfo = usermanager.USERS.items()[0]
         self.assertIsNot(len(test_userinfo.groups), 0)
         for group in test_userinfo.groups:
@@ -134,21 +135,23 @@ class GroupAPITestCase(unittest.TestCase):
         usermanager._reset_db()
         # Many users with one group
         for u in test_users:
-            usermanager._add_user(usermanager.User(u, '', '', groups=[test_group])),
+            usermanager._add_user(usermanager.User(u, '', '',
+                                                   groups=[test_group])),
         self.assertIs(len(usermanager.GROUPS), 1)
         rv = self.app.get('/groups/%s' % (test_group))
         self.assertEquals(200, rv.status_code)
         self.assertEquals(json.loads(rv.data), sorted(test_users))
 
     def test_post_group_single(self):
-        """A POST against a single group database with that group raises a 403"""
+        """A POST against the single group in a database raises a 403"""
         usermanager._reset_db()
-        usermanager._add_user(usermanager.User('user1', '', '', groups=['group1'])),
+        usermanager._add_user(usermanager.User('user1', '', '',
+                                               groups=['group1'])),
         rv = self.app.post('/groups/%s' % ('group1'))
         self.assertEquals(403, rv.status_code)
 
     def test_post_group_empty(self):
-        """A POST against a single group database with that group raises a 403"""
+        """A POST against the single group in a database raises a 403"""
         usermanager._reset_db()
         rv = self.app.post('/groups/%s' % ('group1'))
         self.assertEquals(200, rv.status_code)
@@ -158,14 +161,14 @@ class GroupAPITestCase(unittest.TestCase):
         """A PUT against an empty group database 404s"""
         usermanager._reset_db()
         rv = self.app.put('/groups/%s' % ('group1'),
-                          data = json.dumps([]),
+                          data=json.dumps([]),
                           content_type='application/json')
         self.assertEquals(404, rv.status_code)
 
     def test_put_group_many(self):
-        """A PUT against a many user group database updates all of their groups"""
+        """A PUT against a many-user group database updates them all"""
         usermanager._reset_db()
-        test_users = [('user1', ['group1', 'group2']), 
+        test_users = [('user1', ['group1', 'group2']),
                       ('user2', ['group1']),
                       ('user3', ['group3'])]
         test_group = 'group2'
@@ -173,7 +176,7 @@ class GroupAPITestCase(unittest.TestCase):
         for u, gs in test_users:
             usermanager._add_user(usermanager.User(u, '', '', groups=gs)),
         rv = self.app.put('/groups/%s' % (test_group),
-                          data = json.dumps([u[0] for u in test_users]),
+                          data=json.dumps([u[0] for u in test_users]),
                           content_type='application/json')
         self.assertEquals(200, rv.status_code)
         for user in usermanager.USERS:
@@ -186,13 +189,14 @@ class GroupAPITestCase(unittest.TestCase):
         self.assertEquals(404, rv.status_code)
 
     def test_delete_group_single(self):
-        """A DELETE against a database with many users and one group empties the group."""
+        """A DELETE against a many-user group empties the group."""
         usermanager._reset_db()
         test_users = ['user1', 'user2', 'user3']
         test_group = 'group2'
         # Many users with one group
         for u in test_users:
-            usermanager._add_user(usermanager.User(u, '', '', groups=[test_group])),
+            usermanager._add_user(usermanager.User(u, '', '',
+                                                   groups=[test_group])),
         self.assertIs(len(usermanager.GROUPS), 1)
         self.assertIs(len(usermanager.USERS), 3)
         self.assertIs(len(usermanager.GROUPS[test_group]), 3)

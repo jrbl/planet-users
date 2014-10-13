@@ -13,8 +13,8 @@ pandoc.core.PANDOC_PATH = '/usr/bin/pandoc'
 to_process = []
 for f in os.listdir('.'):
     if re.match('.*\.md$', f):
-        new_file = re.sub('(?P<base>.*)\.md$', 
-                          lambda mo: mo.group('base')+'.rst',
+        new_file = re.sub('(?P<base>.*)\.md$',
+                          lambda mo: mo.group('base') + '.rst',
                           f)
         to_process.append((f, new_file))
 

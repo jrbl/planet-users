@@ -14,12 +14,17 @@ from flask import Flask
 app = flask.Flask(__name__)
 
 
+##################################
+## Data Store Methods (user and group collections)
+##################################
 # This should be a database of some kind, but for PoC, I didn't want to spend
 # a lot of time teaching myself SQLAlchemy.
 # FIXME: This would be a nicer proxy for a database if we had an object 
 #        wrapper around these
 USERS = dict()
 GROUPS = defaultdict(set)
+
+
 def _reset_db():
     """Reset the state of our nascent database to emptiness."""
     global USERS
@@ -75,6 +80,9 @@ def _dump_group(groupname):
     return json.dumps(sorted(GROUPS[groupname]))
 
 
+##################################
+## User representation
+##################################
 class User(object):
     def __init__(self, userid, firstname, lastname, groups):
         self.userid = userid
@@ -99,6 +107,9 @@ class User(object):
         return cls(d['userid'], d['firstname'], d['lastname'], d['groups'])
 
 
+##################################
+## Flask REST API
+##################################
 @app.route('/users/<userid>', methods=['GET'])
 def get_user(userid):
     """Return the matching user record or 404 if none exist."""
@@ -206,19 +217,3 @@ def error_(error):
 def error_page_not_found(error):
     app.logger.debug("404 error handler fired")
     return flask.render_template('404.html', error=error.description), 404
-
-
-if __name__ == "__main__":
-
-    # configuration: TODO take on the command line via argparse
-    db_path = '/tmp/usermanager_store.db'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///{}".format(db_path)
-    DEBUG = True
-
-    # FIXME: include doctests?
-    if DEBUG:
-        app.debug = True
-        app.run()
-    else:
-        app.debug = False
-        app.run(host='0.0.0.0')
